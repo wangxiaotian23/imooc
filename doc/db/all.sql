@@ -422,3 +422,9 @@ insert into `test` (id, name)
 values (1, '测试');
 insert into `test` (id, name)
 values (2, '测试2');
+
+# ---------------给表添加字段
+
+ALTER TABLE member ADD  `login_type` tinyint(1) NOT NULL COMMENT '登录类型';
+ALTER TABLE member ADD  `login_type` `openid` char(50) CHARACTER SET utf8 COMMENT '用户标识';
+ALTER TABLE member ADD `nickname` varchar(50) CHARACTER SET utf8  COMMENT '用户昵称',

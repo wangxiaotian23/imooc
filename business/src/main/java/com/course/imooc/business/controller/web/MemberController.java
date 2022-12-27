@@ -5,20 +5,25 @@ import com.course.imooc.server.dto.LoginMemberDto;
 import com.course.imooc.server.dto.MemberDto;
 import com.course.imooc.server.dto.ResponseDto;
 import com.course.imooc.server.dto.SmsDto;
+import com.course.imooc.server.enums.LoginTypeEnum;
 import com.course.imooc.server.enums.SmsUseEnum;
 import com.course.imooc.server.exception.BusinessException;
 import com.course.imooc.server.service.MemberService;
 import com.course.imooc.server.service.SmsService;
+import com.course.imooc.server.strategy.context.SocialLoginStrategyContext;
 import com.course.imooc.server.util.UuidUtil;
 import com.course.imooc.server.util.ValidatorUtil;
+import com.course.imooc.server.vo.QQLoginVO;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,6 +39,9 @@ public class MemberController {
 
     private static final Logger LOG = LoggerFactory.getLogger(MemberController.class);
     public static final String BUSINESS_NAME = "会员";
+
+    @Autowired
+    private SocialLoginStrategyContext socialLoginStrategyContext;
 
     @Resource
     private MemberService memberService;
@@ -108,6 +116,32 @@ public class MemberController {
         responseDto.setContent(loginMemberDto);
         return responseDto;
     }
+
+
+    /**
+     * 登录
+     */
+    @PostMapping("/login1")
+    public ResponseDto qqLogin(@Valid @RequestBody QQLoginVO qqLoginVO) {
+        ResponseDto responseDto=new ResponseDto();
+
+        MemberDto memberDto = socialLoginStrategyContext.executeLoginStrategy(JSON.toJSONString(qqLoginVO), LoginTypeEnum.QQ);
+
+        responseDto.setContent(memberDto);
+
+        return responseDto;
+    }
+    //"https://graph.qq.com/oauth2.0/show?which=Login&display=pc&client_id=" +
+    //            +this.config.QQ_APP_ID +
+    //            "&response_type=token&scope=all&redirect_uri=" +
+    //            this.config.QQ_REDIRECT_URI,
+
+    //QQ_REDIRECT_URI: "https://www.talkxj.com/oauth/login/qq",
+
+//    public ResponseDto login1(@RequestBody MemberDto memberDto) {
+//
+//
+//    }
 
     /**
      * 退出登录
